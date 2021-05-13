@@ -11,9 +11,9 @@ import axios from '../api'
 export default {
   methods: {
     test: function() {
-      axios.get("/")
+      axios.get("/test")
         .then(function(response) {
-          console.log(response.status);
+          console.log(response);
         })
         .catch(function(error) {
           console.log(error);

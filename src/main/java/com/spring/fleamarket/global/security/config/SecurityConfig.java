@@ -10,6 +10,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.spring.fleamarket.global.security.filter.RestAuthenticationFilter;
+import com.spring.fleamarket.global.security.handler.RestAuthenticationFailureHandler;
+import com.spring.fleamarket.global.security.handler.RestAuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -28,13 +34,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		
 		http.authorizeRequests()
-//				.antMatchers("/").permitAll()
+				.antMatchers("/").permitAll()
+				.antMatchers("/login").permitAll()
 //				.anyRequest().authenticated()
 				.anyRequest().permitAll()
 			.and()
-				.formLogin().loginPage("/login").permitAll()
-			.and()
-				.logout().permitAll();
+			.formLogin().disable();
+		http.addFilterAt(restAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 		
 	}
 	
@@ -42,5 +48,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
+	@Bean
+	public RestAuthenticationFilter restAuthenticationFilter() throws Exception {
+		RestAuthenticationFilter filter = new RestAuthenticationFilter(new AntPathRequestMatcher("/login", "POST"));
+		filter.setAuthenticationManager(this.authenticationManager());
+		filter.setAuthenticationSuccessHandler(new RestAuthenticationSuccessHandler());
+		filter.setAuthenticationFailureHandler(new RestAuthenticationFailureHandler());
+		return filter;
+	}
+
 	
 }

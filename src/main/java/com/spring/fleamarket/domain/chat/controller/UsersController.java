@@ -28,7 +28,9 @@ public class UsersController {
 	public List<MessageModel> recall(@PathVariable int userId, MessageModel msgModel, @LoginedAccount Account account) {
 		
 		
-		int sender = account.getId();
+		//int sender = account.getId();
+		
+		int sender = 1;
 		
 		int receiver = userId;
 		

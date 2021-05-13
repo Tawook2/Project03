@@ -31,5 +31,5 @@ public class WebController {
 		
 		return "chat";
 	}
-	
+
 }
