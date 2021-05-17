@@ -4,16 +4,18 @@
         <div class="search">
             <label>{{ userData.username}}</label>
         </div>
-        <ul class="list" id="usersList">
-            <a href="#" onclick="selectUser('${user.id}','${user.name}')"><li class="clearfix">
-                        <img src="https://source.unsplash.com/featured/face=2" width="55px" height="55px" alt="avatar" />
-                        <div class="about">
-                            <div id="userNameAppender_${user.name}" class="name">{{ userData}}</div>
-                            <div class="status">
-                                <i class="fa fa-circle offline"></i>
-                            </div>
+        <ul class="list" id="usersList" >
+            <a href="#" @click="selectUser(i.id, i.name)" :key="i.id" :value="i" v-for="i in userData">
+                <li class="clearfix" >
+                    <img src="https://source.unsplash.com/featured/face=2" width="55px" height="55px" alt="avatar" />
+                    <div class="about">
+                        <div id="userNameAppender_${user.name}" class="name">{{i.name}}</div>
+                        <div class="status">
+                            <i class="fa fa-circle offline"></i>
                         </div>
-                    </li></a>
+                    </div>
+                </li>
+            </a>
         </ul>
     </div>
 
@@ -23,7 +25,7 @@
                  src="https://source.unsplash.com/featured/face=3" width="55px"/>
 
             <div class="chat-about">
-                <div class="chat-with" id="selectedUserId"></div>
+                <div class="chat-with" id="selectedUserId" v-text="opponent">{{opponent}}</div>
                 <div class="chat-num-messages"></div>
             </div>
             <i class="fa fa-star"></i>
@@ -42,7 +44,7 @@
             <i class="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
             <i class="fa fa-file-image-o"></i>
 
-            <button id="sendBtn">Send</button>
+            <button id="sendBtn" @click="sendMessage(message)">Send</button>
 
             <button v-on:click="sendMessage('Hello World')">sendMessage</button>
 
@@ -61,6 +63,11 @@
 <script>
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+//import axios from '../api'
+
+//import Stomp from 'webstomp-client'
+//import SockJS from 'sockjs-client'
+
 
 export default {
     name: 'App',
@@ -70,64 +77,82 @@ export default {
 
     data: function() {
         return {
-        userData : 'test01',
-        socket: null,
-        stompClient: null,
+        userData : [
+            {
+                id : 1,
+                name : 'test01'
+            },
+            {
+                id : 2,
+                name : 'test02'
+            },
+            {
+                id : 3,
+                name : 'test03'
+            },
+        
+        ],
         url: 'http://localhost:8081/fleamarket',
-        // userId : 'test01',
+        data : null,
+        selectedUser : '',
+        opponent : '',
+        stompClient : null,
         }
     },
     methods: {
             connectToChat(userId) {
-            console.log(userId)
-            console.log("connecting to chat...")
-            this.socket = new SockJS(this.url + '/ws');
-            this.stompClient = Stomp.over(this.socket);
-            this.stompClient.connect({}, function (frame) {
-                console.log("connected to: " + frame);
-                // stompClient.subscribe("/topic/messages/" + userId, function (response) {
-                //     let data = JSON.parse(response.body);
-                            
-                //     render(data.content, data.senderId);
-                            
-                // });
-            });
-        }
-    },
+                //console.log(userId)
+                console.log("connecting to chat...")
+                let socket = new SockJS(this.url + '/ws');
+                console.log("URL : " + this.url + '/ws');
+
+                console.log("웹소켓 확인" + socket);
+                this.stompClient = Stomp.over(socket);
+                console.log("중간체크" + this.stompClient);
+                this.stompClient.connect({}, function (frame) {
+                    console.log("connected to: " + frame);
+
+
+                    this.stompClient.subscribe("http://localhost:8081/topic/messages/" + userId, function (response) {
+                    this.data = JSON.parse(response.body);
+                    console.log(this.data);
+                    //     render(data.content, data.senderId);         
+                    });
+                });
+
+            },
+
+            selectUser(userId, userName) {
+                console.log("selecting users: " + userId);
+                this.selectedUser = userId;
+                console.log(userName);
+                //$('li').remove("#chat-contents");
+                
+                //recallChat(selectedUser);
+                
+                // let isNew = document.getElementById("newMessage_" + userName) !== null;
+                //     if (isNew) {
+                //         let element = document.getElementById("newMessage_" + userName);
+                //         element.parentNode.removeChild(element);
+                //         render(newMessages.get(userName), userName);
+                //     }
+                //    $('#selectedUserId').html('');
+                //    $('#selectedUserId').append('Chat with ' + userName);
+
+                this.opponent ='Chat with ' + userName;
+                //this.$refs.opponent ='Chat with ' + userName;
+            }
+        },
+
+        
+                
 
     created: function(){
-        this.connectToChat("test01");
-    }
 
-   
-//     data: function(){
-//     return {
-//         userData : "test01",
-//         connection: null
-//     }
-// },
-//     methods: {
-//         sendMessage: function(message){
-//         console.log(this.connection)
-//         this.connection.send(message);
-//     }
-// },
+        this.connectToChat(1);
+        
 
-//     created: function(){
-//         console.log("Starting Connection to WebSocket server")
-//         this.connection = new WebSocket("wss://echo.websocket.org")
-
-//         this.connection.onopen = function(event){
-//         console.log(event)
-//         console.log("Successfully connected to the echo WebSocket Server");
-//     }
-
-//     this.connection.onmessage = function(event){
-//       console.log(event)
-//     }
-//   }
-    
-    
+    } 
 }
 
 </script>

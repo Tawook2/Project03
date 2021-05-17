@@ -18,7 +18,8 @@
     "vue": "^2.6.11",
     "vue-material": "^1.0.0-beta-15",
     "vue-router": "^3.5.1",
-    "websocket": "^1.0.34"
+    "websocket": "^1.0.34",
+    "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
