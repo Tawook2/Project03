@@ -3,6 +3,7 @@ let stompClient;
 let selectedUser;
 let newMessages = new Map();
 
+// 완료
 function connectToChat(userId) {
     console.log("connecting to chat...")
     let socket = new SockJS(url + '/ws');
@@ -18,6 +19,7 @@ function connectToChat(userId) {
     });
 }
 
+// 완료
 function sendMsg(from, text) {
     stompClient.send("/app/chat/" + selectedUser, {}, JSON.stringify({
         senderId: from,
@@ -26,6 +28,7 @@ function sendMsg(from, text) {
     }));
 }
 
+// 완료
 function selectUser(userId, userName) {
     console.log("selecting users: " + userId);
     selectedUser = userId;

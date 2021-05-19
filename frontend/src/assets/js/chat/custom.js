@@ -36,6 +36,7 @@ function render(message, userId) {
     }.bind(this), 1500);
 }
 
+// 완료
 function sendMessage(message) {
     let username = $('#userName').val();
     console.log(username)

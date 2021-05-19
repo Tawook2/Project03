@@ -39,14 +39,14 @@
         </div> <!-- end chat-history -->
 
         <div class="chat-message clearfix">
-            <textarea id="message-to-send" name="message-to-send" placeholder="Type your message" rows="3"></textarea>
+            <textarea id="message-to-send" name="message-to-send" placeholder="Type your message" rows="3" v-model="message"></textarea>
 
             <i class="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
             <i class="fa fa-file-image-o"></i>
-
+            
             <button id="sendBtn" @click="sendMessage(message)">Send</button>
 
-            <button v-on:click="sendMessage('Hello World')">sendMessage</button>
+            
 
         </div> <!-- end chat-message -->
 
@@ -65,12 +65,12 @@ import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 //import axios from '../api'
 
-//import Stomp from 'webstomp-client'
-//import SockJS from 'sockjs-client'
-
+let socket = new SockJS('http://localhost:8081/fleamarket/ws');
+let stompClient = Stomp.over(socket);
 
 export default {
     name: 'App',
+    
     components: {
         
     },
@@ -96,27 +96,48 @@ export default {
         data : null,
         selectedUser : '',
         opponent : '',
-        stompClient : null,
+        message : '',
+        loginedUser : 1,
+        
         }
     },
     methods: {
+
+            render(message, userId) {
+                console.log(message);
+                console.log(userId);
+            //     scrollToBottom();
+            //     // responses
+            //     var templateResponse = Handlebars.compile($("#message-response-template").html());
+            //     var contextResponse = {
+            //         response: message,
+            //         time: getCurrentTime(),
+            //         userId: userId
+            //     };
+
+            //     setTimeout(function () {
+            //         $chatHistoryList.append(templateResponse(contextResponse));
+            //         scrollToBottom();
+            //     }.bind(this), 1500);
+            },
+
             connectToChat(userId) {
                 //console.log(userId)
                 console.log("connecting to chat...")
-                let socket = new SockJS(this.url + '/ws');
                 console.log("URL : " + this.url + '/ws');
 
+                
+
                 console.log("웹소켓 확인" + socket);
-                this.stompClient = Stomp.over(socket);
+                
                 console.log("중간체크" + this.stompClient);
-                this.stompClient.connect({}, function (frame) {
+                stompClient.connect({}, function (frame) {
                     console.log("connected to: " + frame);
 
-
-                    this.stompClient.subscribe("http://localhost:8081/topic/messages/" + userId, function (response) {
+                    stompClient.subscribe("http://localhost:8081/topic/messages/" + userId, function (response) {
                     this.data = JSON.parse(response.body);
                     console.log(this.data);
-                    //     render(data.content, data.senderId);         
+                        this.render(this.data.content, this.data.senderId);         
                     });
                 });
 
@@ -126,8 +147,10 @@ export default {
                 console.log("selecting users: " + userId);
                 this.selectedUser = userId;
                 console.log(userName);
+                
                 //$('li').remove("#chat-contents");
                 
+                //제일 나중에
                 //recallChat(selectedUser);
                 
                 // let isNew = document.getElementById("newMessage_" + userName) !== null;
@@ -136,21 +159,57 @@ export default {
                 //         element.parentNode.removeChild(element);
                 //         render(newMessages.get(userName), userName);
                 //     }
-                //    $('#selectedUserId').html('');
-                //    $('#selectedUserId').append('Chat with ' + userName);
-
+            
                 this.opponent ='Chat with ' + userName;
-                //this.$refs.opponent ='Chat with ' + userName;
-            }
-        },
+            
+            },
+        
+            sendMsg(from, text) {
+                stompClient.send("http://localhost:8081/app/chat/" + this.selectedUser, {}, JSON.stringify({
+                    senderId: from,
+                    receiverId: this.selectedUser,
+                    content: text
+                }));
+            },
 
+            scrollToBottom() {
+                //var chatHistory = document.getElementsByClassName("chat-history");
+                //chatHistory.scrollTop(chatHistory[0].scrollHeight);
+            },
+
+            sendMessage(message) {
+    
+                console.log("보내는 사람:" + this.loginedUser);
+
+                console.log("받는 사람: " + this.selectedUser);
+
+                console.log("보내는 메세지: " + message);
+
+                this.sendMsg(this.loginedUser, message);
+
+                this.scrollToBottom();
+
+                // if (message.trim() !== '') {
+                //     var template = Handlebars.compile($("#message-template").html());
+                //     var context = {
+                //         messageOutput: message,
+                //         time: getCurrentTime(),
+                //         toUserName: selectedUser
+                //     };
+
+                //     $chatHistoryList.append(template(context));
+                this.scrollToBottom();
+
+                this.message = '';
+                    
+                }
+            },
         
                 
 
     created: function(){
 
         this.connectToChat(1);
-        
 
     } 
 }
