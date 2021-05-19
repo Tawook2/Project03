@@ -5,6 +5,7 @@ import LoginView from "../views/LoginView.vue"
 import ChatTest from "../views/ChatTest.vue"
 import ChatView from "../views/ChatView.vue"
 
+
 Vue.use(VueRouter);
 
 const router = new VueRouter({

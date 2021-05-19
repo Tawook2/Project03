@@ -7,6 +7,11 @@ import VueMaterial from 'vue-material'
 
 
 import io from 'socket.io-client';
+import jQuery from 'jquery'
+
+window.jQuery = jQuery
+window.$ = jQuery
+
 const socket = io('http://localhost:8080');
 
 

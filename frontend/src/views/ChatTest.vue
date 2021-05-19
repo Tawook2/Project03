@@ -63,6 +63,7 @@
 <script>
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+
 //import axios from '../api'
 
 let socket = new SockJS('http://localhost:8081/fleamarket/ws');
@@ -106,7 +107,7 @@ export default {
             render(message, userId) {
                 console.log(message);
                 console.log(userId);
-            //     scrollToBottom();
+                this.scrollToBottom();
             //     // responses
             //     var templateResponse = Handlebars.compile($("#message-response-template").html());
             //     var contextResponse = {
@@ -173,8 +174,16 @@ export default {
             },
 
             scrollToBottom() {
-                //var chatHistory = document.getElementsByClassName("chat-history");
-                //chatHistory.scrollTop(chatHistory[0].scrollHeight);
+
+                window.$chatHistory = window.$('.chat-history');
+                window.$chatHistory.scrollTop(window.$chatHistory[0].scrollHeight);
+
+                // var chatHistory = document.getElementsByClassName("chat-history");
+                // chatHistory.scrollTop(chatHistory[0].scrollHeight);
+            },
+
+            getCurrentTime() {
+                return new Date().toLocaleTimeString().replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3");
             },
 
             sendMessage(message) {
@@ -193,27 +202,26 @@ export default {
                 //     var template = Handlebars.compile($("#message-template").html());
                 //     var context = {
                 //         messageOutput: message,
-                //         time: getCurrentTime(),
-                //         toUserName: selectedUser
+                //         time: this.getCurrentTime(),
+                //         toUserName: this.selectedUser
                 //     };
 
                 //     $chatHistoryList.append(template(context));
-                this.scrollToBottom();
+                    this.scrollToBottom();
 
-                this.message = '';
+                    this.message = '';
                     
                 }
             },
         
                 
 
-    created: function(){
+        created: function(){
 
-        this.connectToChat(1);
+            this.connectToChat(1);
 
-    } 
+        }
+    
 }
 
 </script>
-
-
